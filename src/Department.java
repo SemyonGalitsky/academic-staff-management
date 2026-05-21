@@ -1,44 +1,50 @@
 public class Department {
     private String name;
     private int studentCount;
-    private Lecturer[] lecturers;
-    private int lecturerCount;
+    private Lecturer[] lecturers = new Lecturer[2];
+    private int lecturerCount =0;
 
     public Department(String name, int studentCount) {
-        this.name = name;
-        this.studentCount = studentCount;
-        this.lecturers = new Lecturer[2];
-        this.lecturerCount = 0;
+        setName(name);
+        setStudentCount(studentCount);
     }
 
+    private boolean setName(String name) {
+        this.name = name;
+        return true;
+    }
     public String getName(){
         return name;
     }
-    public int getStudentCount(){
-        return studentCount;
-    }
-    public Lecturer[] getLecturers() {
-        return lecturers;
-    }
-    public int getLecturerCount(){
-        return lecturerCount;
-    }
 
-    private void growLecturers() {
-        Lecturer[] newArray = new Lecturer[this.lecturers.length * 2];
-        for (int i = 0; i < this.lecturers.length; i++) {
-            newArray[i] = this.lecturers[i];
+    public boolean setStudentCount(int studentCount) {
+        if (studentCount >= 0) {
+            this.studentCount = studentCount;
+            return true;
         }
-        this.lecturers = newArray;
+        return false;
+    }
+    public int getStudentCount() {
+        return studentCount;
     }
 
     public void addLecturer(Lecturer lecturer) {
-        if (lecturerCount >= lecturers.length) {
-            growLecturers();
+        if (lecturerCount == lecturers.length) {
+            Lecturer[] newLecturers = new Lecturer[lecturerCount * 2];
+            for (int i = 0; i < lecturerCount; i++) {
+                newLecturers[i] = lecturers[i];
+            }
+            lecturers = newLecturers;
         }
         lecturers[lecturerCount] = lecturer;
         lecturerCount++;
         lecturer.setDepartment(this);
+    }
+    public Lecturer[] getLecturers() {
+        return lecturers;
+    }
+    public int getLecturerCount() {
+        return lecturerCount;
     }
 }
 

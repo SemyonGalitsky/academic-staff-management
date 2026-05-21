@@ -16,7 +16,7 @@ public class Lecturer {
         setWage(wage);
     }
 
-    public boolean setName(String name) {
+    private boolean setName(String name) {
         this.name = name;
         return true;
     }
@@ -24,7 +24,7 @@ public class Lecturer {
         return name;
     }
 
-    public boolean setId(int id) {
+    private boolean setId(int id) {
         if (id > 99999999 && id < 1000000000) {
             this.id = id;
             return true;
@@ -80,5 +80,11 @@ public class Lecturer {
         }
         committees[committeeCount] = committee;
         committeeCount++;
+    }
+    public Committee[] getCommittees() {
+        return committees;
+    }
+    public int getCommitteeCount() {
+        return committeeCount;
     }
 }
