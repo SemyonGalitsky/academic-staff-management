@@ -10,7 +10,7 @@ public class Department {
         this.lecturers = new Lecturer[2];
         this.lecturerCount = 0;
     }
-    //getters
+
     public String getName(){
         return name;
     }
@@ -24,6 +24,21 @@ public class Department {
         return lecturerCount;
     }
 
+    private void growLecturers() {
+        Lecturer[] newArray = new Lecturer[this.lecturers.length * 2];
+        for (int i = 0; i < this.lecturers.length; i++) {
+            newArray[i] = this.lecturers[i];
+        }
+        this.lecturers = newArray;
+    }
 
-
+    public void addLecturer(Lecturer lecturer) {
+        if (lecturerCount >= lecturers.length) {
+            growLecturers();
+        }
+        lecturers[lecturerCount] = lecturer;
+        lecturerCount++;
+        lecturer.setDepartment(this);
+    }
 }
+
