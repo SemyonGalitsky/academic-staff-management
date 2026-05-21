@@ -87,4 +87,6 @@ public class Lecturer {
     public int getCommitteeCount() {
         return committeeCount;
     }
+
+    // need to add option to be removed from committe here and on Committee.java
 }
