@@ -8,6 +8,14 @@ public class Lecturer {
     private Committee[] committees = new Committee[2];
     private int committeeCount = 0;
 
+    public Lecturer(String name, int id, Title level, String degreeName, int wage) {
+        setName(name);
+        setId(id);
+        setTitle(level);
+        setDegreeName(degreeName);
+        setWage(wage);
+    }
+
     public boolean setName(String name) {
         this.name = name;
         return true;
@@ -72,13 +80,5 @@ public class Lecturer {
         }
         committees[committeeCount] = committee;
         committeeCount++;
-    }
-
-    public Lecturer(String name, int id, Title level, String degreeName, int wage) {
-        setName(name);
-        setId(id);
-        setTitle(level);
-        setDegreeName(degreeName);
-        setWage(wage);
     }
 }
