@@ -63,6 +63,9 @@ public class Lecturer {
     }
 
     public boolean setDepartment(Department department) {
+        if (this.department == department) {
+            return false;
+        }
         this.department = department;
         return true;
     }
@@ -70,7 +73,18 @@ public class Lecturer {
         return department;
     }
 
-    public void addCommittee(Committee committee) {
+    private boolean hasCommittee(Committee committee) {
+        for (int i = 0; i < committeeCount; i++) {
+            if (committees[i] == committee) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean addCommittee(Committee committee) {
+        if (hasCommittee(committee)) {
+            return false;
+        }
         if (committeeCount == committees.length) {
             Committee[] newCommittees = new Committee[committeeCount * 2];
             for (int i = 0; i < committeeCount; i++) {
@@ -80,6 +94,24 @@ public class Lecturer {
         }
         committees[committeeCount] = committee;
         committeeCount++;
+        return true;
+    }
+    public boolean removeCommittee(Committee committee) {
+        if (!hasCommittee(committee)) {
+            return false;
+        }
+        int counter = 0;
+        for (int i = 0; i < committeeCount; i++ ) {
+            if (committees[i] == committee) {
+                counter = i;
+                break;
+            }
+        }
+        for (int i = counter; i < committeeCount - 1; i++) {
+            committees[i] = committees[i + 1];
+        }
+        committeeCount--;
+        return true;
     }
     public Committee[] getCommittees() {
         return committees;
@@ -87,6 +119,4 @@ public class Lecturer {
     public int getCommitteeCount() {
         return committeeCount;
     }
-
-    // need to add option to be removed from committe here and on Committee.java
 }
