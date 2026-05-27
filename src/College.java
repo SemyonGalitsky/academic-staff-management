@@ -47,6 +47,32 @@ public class College {
         return null;
     }
 
+    private Committee getCommitteeByName(String name){
+        for (int i = 0; i < committeesCount; i++) {
+            if (committees[i].getName().equals(name)) {
+                return committees[i];
+            }
+        }
+        return null;
+    }
+
+    private Department getDepartmentByName(String name){
+        for (int i = 0; i < departmentsCount; i++) {
+            if (departments[i].getName().equals(name)) {
+                return departments[i];
+            }
+        }
+        return null;
+    }
+    private boolean isLecturerHeadOfAnyCommittee(Lecturer lecturer) {
+        for (int i = 0; i < committeesCount; i++) {
+            if (committees[i].getHeadOfCommittee() == lecturer) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean addCommittee(String committeeName, String chairName) {
         Lecturer chair = getLecturerByName(chairName);
 
@@ -94,37 +120,79 @@ public class College {
         return false;
     }
 
+    public boolean addDepartment(String departmentName, int studentCount){
 
+        //checks if already exist
+        for (int i = 0; i < departmentsCount; i++){
+            if (departments[i].getName().equals(departmentName)){
+                return false;
+            }
+        }
+        // in case its full
+        if (this.departmentsCount == this.departments.length) {
+            Department[] newDepartments = new Department[departmentsCount * 2];
+            for (int i = 0; i < departmentsCount; i++) {
+                newDepartments[i] = departments[i];
+            }
+            departments = newDepartments;
+        }
 
+        //creates and add it
+        departments[departmentsCount] = new Department(departmentName, studentCount);
+        departmentsCount++;
+        return true;
+    }
 
+    public boolean assignLecturerToDepartment(String lecturerName, String deptName) {
+        Lecturer lec = getLecturerByName(lecturerName);
+        Department dept = getDepartmentByName(deptName);
 
+        if (lec != null && dept !=null){
+            if (lec.getDepartment() != null) {
+                return false;
+            }
+            dept.addLecturer(lec);
+            return true;
+        }
+        return false;
+    }
 
+    public boolean assignLecturerToCommittee(String lecturerName, String committeeName){
+        Lecturer lec = getLecturerByName(lecturerName);
+        Committee com = getCommitteeByName(committeeName);
 
+            if (lec != null || com != null) {
+                return false;
+            }
+            if (isLecturerHeadOfAnyCommittee(lec)) {
+                return false;
+            }
 
+            return com.addLecturer(lec);
+
+    }
 
 
     public String getName() {
         return name;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Lecturer[] getLecturers() {
         return lecturers;
     }
 
-    public void setLecturers(Lecturer[] lecturers) {
-        this.lecturers = lecturers;
+    public int getLecturersCount() {
+        return lecturersCount;
     }
 
+    public Committee[] getCommittees() {
+        return committees;
+    }
 
     public int getCommitteesCount() {
         return committeesCount;
     }
 
-    public void setCommittees(Committee[] committees) {
-        this.committees = committees;
-    }
+
 }
 
