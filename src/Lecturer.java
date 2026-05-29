@@ -2,13 +2,13 @@ public class Lecturer {
     private String name;
     private int id;
     private int wage;
-    private Title level;
+    private Title degree;
     private String degreeName;
     private Department department;
     private Committee[] committees = new Committee[2];
     private int committeeCount = 0;
 
-    public Lecturer(String name, int id, Title level, String degreeName, int wage) {
+    public Lecturer(String name, int id, int level, String degreeName, int wage) {
         setName(name);
         setId(id);
         setTitle(level);
@@ -46,12 +46,27 @@ public class Lecturer {
         return wage;
     }
 
-    public boolean setTitle(Title level) {
-        this.level = level;
+    public boolean setTitle(int level) {
+        switch (level) {
+            case 1:
+                this.degree = Title.BACHELORS;
+                break;
+            case 2:
+                this.degree = Title.MASTERS;
+                break;
+            case 3:
+                this.degree = Title.DR;
+                break;
+            case 4:
+                this.degree = Title.PROFESSOR;
+                break;
+            default:
+                return false;
+        }
         return true;
     }
     public Title getTitle() {
-        return level;
+        return degree;
     }
 
     public boolean setDegreeName(String degreeName) {

@@ -1,6 +1,6 @@
 public enum Title {
-    FIRST,
-    SECOND,
+    BACHELORS,
+    MASTERS,
     DR,
-    PROF
+    PROFESSOR
 }

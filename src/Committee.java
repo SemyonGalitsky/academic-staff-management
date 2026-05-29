@@ -27,18 +27,18 @@ public class Committee {
     }
 
     private boolean setHeadOfCommittee(Lecturer lecturer) {
-        if (lecturer.getTitle() == Title.DR || lecturer.getTitle() == Title.PROF) {
+        if (lecturer.getTitle() == Title.DR || lecturer.getTitle() == Title.PROFESSOR) {
             headOfCommittee = lecturer;
             headOfCommittee.addCommittee(this);
             return true;
         }
         return false;
     }
-    private boolean updateHeadOfCommittee(Lecturer newHead) {
+    public boolean updateHeadOfCommittee(Lecturer newHead) {
         if (newHead == headOfCommittee) {
             return false;
         }
-        if (newHead.getTitle() != Title.DR && newHead.getTitle() != Title.PROF) {
+        if (newHead.getTitle() != Title.DR && newHead.getTitle() != Title.PROFESSOR) {
             return false;
         }
         addLecturer(headOfCommittee);
@@ -55,6 +55,7 @@ public class Committee {
 
     public boolean addLecturer(Lecturer lecturer) {
         if (hasLecturer(lecturer)) {
+            System.out.println("Error: Lecturer already part of committee.");
             return false;
         }
         if (lecturerCount == lecturers.length) {

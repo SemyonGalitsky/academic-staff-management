@@ -30,6 +30,7 @@ public class Department {
 
     public boolean addLecturer(Lecturer lecturer) {
         if (lecturer.getDepartment() != null) {
+            System.out.println("Error: Lecturer already part of department.");
             return false;
         }
         if (lecturerCount == lecturers.length) {
