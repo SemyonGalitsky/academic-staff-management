@@ -9,13 +9,11 @@ public class Department {
         setStudentCount(studentCount);
     }
 
-    private boolean setName(String name) {
+    public boolean setName(String name) {
         this.name = name;
         return true;
     }
-    public String getName(){
-        return name;
-    }
+    public String getName() { return name; }
 
     public boolean setStudentCount(int studentCount) {
         if (studentCount >= 0) {
@@ -24,15 +22,11 @@ public class Department {
         }
         return false;
     }
-    public int getStudentCount() {
-        return studentCount;
-    }
+    public int getStudentCount() { return studentCount; }
 
-    public boolean addLecturer(Lecturer lecturer) {
-        if (lecturer.getDepartment() != null) {
-            System.out.println("Error: Lecturer already part of department.");
-            return false;
-        }
+    public String addLecturer(Lecturer lecturer) {
+        if (lecturer.getDepartment() != null) return "- Lecturer already part of a department.";
+
         if (lecturerCount == lecturers.length) {
             Lecturer[] newLecturers = new Lecturer[lecturerCount * 2];
             for (int i = 0; i < lecturerCount; i++) {
@@ -43,26 +37,16 @@ public class Department {
         lecturers[lecturerCount] = lecturer;
         lecturerCount++;
         lecturer.setDepartment(this);
-        return true;
-    }
-    public Lecturer[] getLecturers() {
-        return lecturers;
-    }
-    public int getLecturerCount() {
-        return lecturerCount;
+        return "SUCCESS";
     }
 
     public double getAverageWage() {
-        double avg = 0;
+        if (lecturerCount == 0) return 0;
+
         double sum = 0;
-        if (lecturerCount == 0) {
-            return avg;
-        }
         for (int i = 0; i < lecturerCount; i++) {
             sum += lecturers[i].getWage();
         }
-        avg = sum / lecturerCount;
-        return avg;
+        return sum / lecturerCount;
     }
 }
-

@@ -8,37 +8,43 @@ public class College {
     private int departmentsCount = 0;
 
     public College(String name) {
-        setName(name);
+        this.name = name;
     }
 
-    public boolean addLecturer(String name, int id, int level, String degreeName, int wage){
-        boolean isValid = true;
+    public String getName() {
+        return name;
+    }
+
+    public String addLecturer(String name, int id, int level, String degreeName, int wage) {
+        String errors = "";
 
         if (getLecturerByName(name) != null) {
-            System.out.println("Error: Lecturer already exists.");
-            isValid = false;
+            errors += "- Lecturer already exists.\n";
         }
 
         if (id <= 99999999 || id >= 1000000000) {
-            System.out.println("Error: Id out of range.");
-            System.out.println("    must contain 9 digits.");
-            isValid = false;
-        }
-        if (level > 5 || level < 0) {
-            System.out.println("Error: Degree level out of range.");
-            System.out.println("    must be between 1 to 4.");
-            isValid = false;
-        }
-        if (wage < 0) {
-            System.out.println("Error: Wage out of range.");
-            System.out.println("    must be positive.");
-            isValid = false;
-        }
-        if(!isValid) {
-            return false;
+            errors += "- ID must contain exactly 9 digits.\n";
+        } else {
+            for (int i = 0; i < lecturersCount; i++) {
+                if (id == lecturers[i].getId()) {
+                    errors += "- ID already taken, must be unique.\n";
+                    break;
+                }
+            }
         }
 
-        if (lecturers.length == lecturersCount){
+        if (level < 1 || level > 4) {
+            errors += "- Degree level must be between 1 to 4.\n";
+        }
+        if (wage < 0) {
+            errors += "- Wage must be positive.\n";
+        }
+
+        if (!errors.isEmpty()) {
+            return errors;
+        }
+
+        if (lecturers.length == lecturersCount) {
             Lecturer[] newLecturers = new Lecturer[lecturersCount * 2];
             for (int i = 0; i < lecturersCount; i++) {
                 newLecturers[i] = lecturers[i];
@@ -49,7 +55,7 @@ public class College {
         Lecturer lecturer = new Lecturer(name, id, level, degreeName, wage);
         lecturers[lecturersCount] = lecturer;
         lecturersCount++;
-        return true;
+        return "SUCCESS";
     }
 
     private Lecturer getLecturerByName(String name) {
@@ -61,48 +67,40 @@ public class College {
         return null;
     }
 
-    public double getAverageWage(int lecturersCount) {
-        if (lecturersCount == 0) {
-            return 0;
-        }
+    public double getAverageWage() {
+        if (lecturersCount == 0) return 0;
         double wage = 0;
         for (int i = 0; i < lecturersCount; i++) {
             wage += lecturers[i].getWage();
         }
-        wage = wage / lecturersCount;
-        return wage;
+        return wage / lecturersCount;
     }
 
-    public Lecturer[] getLecturers() {
-        return lecturers;
+    public String getAllLecturersDetails() {
+        if (lecturersCount == 0) return "";
+        String details = "";
+        for (int i = 0; i < lecturersCount; i++) {
+            details += lecturers[i].toString() + "\n";
+        }
+        return details;
     }
 
-    public int getLecturersCount() {
-        return lecturersCount;
-    }
-
-
-
-    public boolean addCommittee(String committeeName, String headLecturer) {
-        boolean isValid = true;
-        Lecturer headOfCommittee = getLecturerByName(headLecturer);
+    public String addCommittee(String committeeName, String headLecturerName) {
+        String errors = "";
 
         if (getCommitteeByName(committeeName) != null) {
-            System.out.println("Error: Committee already exists.");
-            isValid = false;
-        }
-        if (headOfCommittee == null) {
-            System.out.println("Error: Lecturer named " + headLecturer + " was not found.");
-            isValid = false;
-        } else if (headOfCommittee.getTitle() != Title.DR && headOfCommittee.getTitle() != Title.PROFESSOR) {
-            System.out.println("Error: Lecturer " + headLecturer + " is not qualified to be " +
-                    "head of committee.");
-            System.out.println("    Requirements: " + Title.DR + " , " + Title.PROFESSOR);
-            isValid = false;
+            errors += "- Committee already exists.\n";
         }
 
-        if (!isValid) {
-            return false;
+        Lecturer headOfCommittee = getLecturerByName(headLecturerName);
+        if (headOfCommittee == null) {
+            errors += "- Lecturer named " + headLecturerName + " was not found.\n";
+        } else if (headOfCommittee.getTitle() != Title.DR && headOfCommittee.getTitle() != Title.PROFESSOR) {
+            errors += "- Lecturer " + headLecturerName + " is not qualified. Requirements: DR or PROFESSOR.\n";
+        }
+
+        if (!errors.isEmpty()) {
+            return errors;
         }
 
         if (committees.length == committeesCount) {
@@ -116,10 +114,10 @@ public class College {
         Committee committee = new Committee(committeeName, headOfCommittee);
         committees[committeesCount] = committee;
         committeesCount++;
-        return true;
+        return "SUCCESS";
     }
 
-    private Committee getCommitteeByName(String name){
+    private Committee getCommitteeByName(String name) {
         for (int i = 0; i < committeesCount; i++) {
             if (committees[i].getName().equals(name)) {
                 return committees[i];
@@ -128,32 +126,27 @@ public class College {
         return null;
     }
 
-    public Committee[] getCommittees() {
-        return committees;
+    public String getAllCommitteesDetails() {
+        if (committeesCount == 0) return "";
+        String details = "";
+        for (int i = 0; i < committeesCount; i++) {
+            details += committees[i].toString() + "\n";
+        }
+        return details;
     }
 
-    public int getCommitteesCount() {
-        return committeesCount;
-    }
-
-
-
-    public boolean addDepartment(String departmentName, int studentCount){
-        boolean isValid = true;
+    public String addDepartment(String departmentName, int studentCount) {
+        String errors = "";
 
         if (getDepartmentByName(departmentName) != null) {
-            System.out.println("Error: Department already exists.");
-            isValid = false;
+            errors += "- Department already exists.\n";
         }
-
         if (studentCount < 0) {
-            System.out.println("Error: student count is out of range.");
-            System.out.println("    must be positive.");
-            isValid = false;
+            errors += "- Student count cannot be negative.\n";
         }
 
-        if (!isValid) {
-            return false;
+        if (!errors.isEmpty()) {
+            return errors;
         }
 
         if (departments.length == departmentsCount) {
@@ -167,10 +160,10 @@ public class College {
         Department department = new Department(departmentName, studentCount);
         departments[departmentsCount] = department;
         departmentsCount++;
-        return true;
+        return "SUCCESS";
     }
 
-    private Department getDepartmentByName(String name){
+    private Department getDepartmentByName(String name) {
         for (int i = 0; i < departmentsCount; i++) {
             if (departments[i].getName().equals(name)) {
                 return departments[i];
@@ -179,58 +172,57 @@ public class College {
         return null;
     }
 
+    public double getDepartmentAverageWage(String departmentName) {
+        Department department = getDepartmentByName(departmentName);
+        if (department == null) return -1;
+        return department.getAverageWage();
+    }
 
-
-    public boolean assignLecturerToDepartment(String lecturerName, String departmentName) {
-        boolean isValid = true;
+    public String assignLecturerToDepartment(String lecturerName, String departmentName) {
+        String errors = "";
         Lecturer lecturer = getLecturerByName(lecturerName);
         Department department = getDepartmentByName(departmentName);
 
-        if (lecturer == null) {
-            System.out.println("Error: Lecturer doesn't exists.");
-            isValid = false;
-        }
+        if (lecturer == null) errors += "- Lecturer not found.\n";
+        if (department == null) errors += "- Department not found.\n";
 
-        if (department == null) {
-            System.out.println("Error: department doesn't exists.");
-            isValid = false;
-        }
-
-        if (!isValid) {
-            return false;
-        }
+        if (!errors.isEmpty()) return errors.trim();
         return department.addLecturer(lecturer);
-
     }
 
-    public boolean assignLecturerToCommittee(String lecturerName, String committeeName){
-        boolean isValid = true;
+    public String assignLecturerToCommittee(String lecturerName, String committeeName) {
+        String errors = "";
         Lecturer lecturer = getLecturerByName(lecturerName);
         Committee committee = getCommitteeByName(committeeName);
 
-        if (lecturer == null) {
-            System.out.println("Error: Lecturer doesn't exists.");
-            isValid = false;
-        }
+        if (lecturer == null) errors += "- Lecturer not found.\n";
+        if (committee == null) errors += "- Committee not found.\n";
 
-        if (committee == null) {
-            System.out.println("Error: department doesn't exists.");
-            isValid = false;
-        }
-
-        if (!isValid) {
-            return false;
-        }
-
+        if (!errors.isEmpty()) return errors.trim();
         return committee.addLecturer(lecturer);
-
     }
 
-    private boolean setName(String name) {
-        this.name = name;
-        return true;
+    public String removeLecturerFromCommittee(String lecturerName, String committeeName) {
+        String errors = "";
+        Lecturer lecturer = getLecturerByName(lecturerName);
+        Committee committee = getCommitteeByName(committeeName);
+
+        if (lecturer == null) errors += "- Lecturer not found.\n";
+        if (committee == null) errors += "- Committee not found.\n";
+
+        if (!errors.isEmpty()) return errors.trim();
+        return committee.removeLecturer(lecturer);
     }
-    public String getName() {
-        return name;
+
+    public String updateHeadOfCommittee(String lecturerName, String committeeName) {
+        String errors = "";
+        Committee committee = getCommitteeByName(committeeName);
+        Lecturer lecturer = getLecturerByName(lecturerName);
+
+        if (committee == null) errors += "- Committee not found.\n";
+        if (lecturer == null) errors += "- Lecturer not found.\n";
+
+        if (!errors.isEmpty()) return errors.trim();
+        return committee.updateHeadOfCommittee(lecturer);
     }
 }

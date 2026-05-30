@@ -4,27 +4,16 @@ public class Committee {
     private Lecturer[] lecturers = new Lecturer[2];
     private int lecturerCount = 0;
 
-    public Committee(String name,Lecturer headOfCommittee){
+    public Committee(String name, Lecturer headOfCommittee) {
         setName(name);
         setHeadOfCommittee(headOfCommittee);
-        }
+    }
 
     public boolean setName(String name) {
         this.name = name;
         return true;
     }
-    public String getName() {
-        return name;
-    }
-
-    private boolean hasLecturer(Lecturer lecturer) {
-        for (int i = 0; i < lecturerCount; i++) {
-            if (lecturers[i] == lecturer) {
-                return true;
-            }
-        }
-        return false;
-    }
+    public String getName() { return name; }
 
     private boolean setHeadOfCommittee(Lecturer lecturer) {
         if (lecturer.getTitle() == Title.DR || lecturer.getTitle() == Title.PROFESSOR) {
@@ -34,30 +23,60 @@ public class Committee {
         }
         return false;
     }
-    public boolean updateHeadOfCommittee(Lecturer newHead) {
+    public Lecturer getHeadOfCommittee() { return headOfCommittee; }
+
+    public String toString() {
+        String str = "Name: " + name + "\n" +
+                "   Head of committee: " + headOfCommittee.getName() + "\n";
+
+        if (lecturerCount > 0) {
+            str += "    Lecturers: \n";
+            for (int i = 0; i < lecturerCount; i++) {
+                str += "        " + lecturers[i].getName() + "\n";
+            }
+        }
+        return str;
+    }
+
+    private boolean hasLecturer(Lecturer lecturer) {
+        for (int i = 0; i < lecturerCount; i++) {
+            if (lecturers[i] == lecturer) return true;
+        }
+        return false;
+    }
+
+    public String updateHeadOfCommittee(Lecturer newHead) {
+        String errors = "";
         if (newHead == headOfCommittee) {
-            return false;
+            errors += "- Lecturer is already head of the committee.\n";
         }
         if (newHead.getTitle() != Title.DR && newHead.getTitle() != Title.PROFESSOR) {
-            return false;
+            errors += "- Lecturer does not meet requirements (DR or PROFESSOR).\n";
         }
-        addLecturer(headOfCommittee);
-        headOfCommittee = newHead;
-        headOfCommittee.addCommittee(this);
+
+        if (!errors.isEmpty()) return errors.trim();
+
+        Lecturer oldHead = headOfCommittee;
         if (hasLecturer(newHead)) {
             removeLecturer(newHead);
         }
-        return true;
-    }
-    public Lecturer getHeadOfCommittee() {
-        return headOfCommittee;
+        setHeadOfCommittee(newHead);
+        oldHead.removeCommittee(this);
+        addLecturer(oldHead);
+        return "SUCCESS";
     }
 
-    public boolean addLecturer(Lecturer lecturer) {
-        if (hasLecturer(lecturer)) {
-            System.out.println("Error: Lecturer already part of committee.");
-            return false;
+    public String addLecturer(Lecturer lecturer) {
+        String errors = "";
+        if (lecturer == headOfCommittee) {
+            errors += "- Lecturer is the head of committee and cannot be in members list.\n";
         }
+        if (hasLecturer(lecturer)) {
+            errors += "- Lecturer already part of committee.\n";
+        }
+
+        if (!errors.isEmpty()) return errors.trim();
+
         if (lecturerCount == lecturers.length) {
             Lecturer[] newLecturers = new Lecturer[lecturerCount * 2];
             for (int i = 0; i < lecturerCount; i++) {
@@ -68,30 +87,35 @@ public class Committee {
         lecturers[lecturerCount] = lecturer;
         lecturerCount++;
         lecturer.addCommittee(this);
-        return true;
+        return "SUCCESS";
     }
-    public boolean removeLecturer(Lecturer lecturer) {
-        if (!hasLecturer(lecturer)) {
-            return false;
+
+    public String removeLecturer(Lecturer lecturer) {
+        String errors = "";
+        if (lecturer == headOfCommittee) {
+            errors += "- Cannot remove the Head of Committee. Assign a new Head first.\n";
         }
-        int counter = 0;
-        for (int i = 0; i < lecturerCount; i++ ) {
+        if (!hasLecturer(lecturer)) {
+            errors += "- Lecturer is not part of committee.\n";
+        }
+
+        if (!errors.isEmpty()) return errors.trim();
+
+        int indexToRemove = -1;
+        for (int i = 0; i < lecturerCount; i++) {
             if (lecturers[i] == lecturer) {
-                counter = i;
+                indexToRemove = i;
                 break;
             }
         }
-        for (int i = counter; i < lecturerCount - 1; i++) {
+
+        for (int i = indexToRemove; i < lecturerCount - 1; i++) {
             lecturers[i] = lecturers[i + 1];
         }
+        lecturers[lecturerCount - 1] = null;
         lecturerCount--;
+
         lecturer.removeCommittee(this);
-        return true;
-    }
-    public Lecturer[] getLecturers() {
-        return lecturers;
-    }
-    public int getLecturerCount() {
-        return lecturerCount;
+        return "SUCCESS";
     }
 }
