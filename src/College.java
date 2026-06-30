@@ -15,33 +15,19 @@ public class College {
         return name;
     }
 
-    public String addLecturer(String name, int id, int level, String degreeName, int wage) {
-        String errors = "";
-
-        if (getLecturerByName(name) != null) {
-            errors += "- Lecturer already exists.\n";
+    public void addLecturer(Lecturer lecturer) throws ManagementException {
+        if (lecturer.getName().length() < 3) {
+            throw new ManagementException("- Lecturer name is not valid, must be at least 3 letters.");
         }
 
-        if (id <= 99999999 || id >= 1000000000) {
-            errors += "- ID must contain exactly 9 digits.\n";
-        } else {
-            for (int i = 0; i < lecturersCount; i++) {
-                if (id == lecturers[i].getId()) {
-                    errors += "- ID already taken, must be unique.\n";
-                    break;
-                }
+        if (getLecturerByName(lecturer.getName()) != null) {
+            throw new ManagementException("- Lecturer already exists.");
+        }
+
+        for (int i = 0; i < lecturersCount; i++) {
+            if (lecturer.getId() == lecturers[i].getId()) {
+                throw new ManagementException("- ID already taken, must be unique.");
             }
-        }
-
-        if (level < 1 || level > 4) {
-            errors += "- Degree level must be between 1 to 4.\n";
-        }
-        if (wage < 0) {
-            errors += "- Wage must be positive.\n";
-        }
-
-        if (!errors.isEmpty()) {
-            return errors;
         }
 
         if (lecturers.length == lecturersCount) {
@@ -52,13 +38,11 @@ public class College {
             lecturers = newLecturers;
         }
 
-        Lecturer lecturer = new Lecturer(name, id, level, degreeName, wage);
         lecturers[lecturersCount] = lecturer;
         lecturersCount++;
-        return "SUCCESS";
     }
 
-    private Lecturer getLecturerByName(String name) {
+    public Lecturer getLecturerByName(String name) {
         for (int i = 0; i < lecturersCount; i++) {
             if (lecturers[i].getName().equals(name)) {
                 return lecturers[i];
@@ -85,22 +69,22 @@ public class College {
         return details;
     }
 
-    public String addCommittee(String committeeName, String headLecturerName) {
-        String errors = "";
+    public void addCommittee(String committeeName, String headLecturerName) throws ManagementException, MemberAlreadyInCommitteeException {
+        if (committeeName.length() < 3) {
+            throw new ManagementException("- Committee Name is not valid, must be at least 3 letters.");
+        }
 
         if (getCommitteeByName(committeeName) != null) {
-            errors += "- Committee already exists.\n";
+            throw new ManagementException("- Committee already exists.");
         }
 
         Lecturer headOfCommittee = getLecturerByName(headLecturerName);
         if (headOfCommittee == null) {
-            errors += "- Lecturer named " + headLecturerName + " was not found.\n";
-        } else if (headOfCommittee.getTitle() != Title.DR && headOfCommittee.getTitle() != Title.PROFESSOR) {
-            errors += "- Lecturer " + headLecturerName + " is not qualified. Requirements: DR or PROFESSOR.\n";
+            throw new ManagementException("- Lecturer named " + headLecturerName + " was not found.");
         }
 
-        if (!errors.isEmpty()) {
-            return errors;
+        if (!(headOfCommittee instanceof Dr)) {
+            throw new ManagementException("- Lecturer " + headLecturerName + " is not qualified. Requirements: DR or PROFESSOR.");
         }
 
         if (committees.length == committeesCount) {
@@ -111,13 +95,12 @@ public class College {
             committees = newCommittees;
         }
 
-        Committee committee = new Committee(committeeName, headOfCommittee);
+        Committee committee = new Committee(committeeName, (Dr) headOfCommittee);
         committees[committeesCount] = committee;
         committeesCount++;
-        return "SUCCESS";
     }
 
-    private Committee getCommitteeByName(String name) {
+    public Committee getCommitteeByName(String name) {
         for (int i = 0; i < committeesCount; i++) {
             if (committees[i].getName().equals(name)) {
                 return committees[i];
@@ -135,18 +118,13 @@ public class College {
         return details;
     }
 
-    public String addDepartment(String departmentName, int studentCount) {
-        String errors = "";
+    public void addDepartment(String departmentName, int studentCount) throws ManagementException {
+        if (departmentName.length() < 3) {
+            throw new ManagementException("- Department name is not valid, must be at least 3 letters.");
+        }
 
         if (getDepartmentByName(departmentName) != null) {
-            errors += "- Department already exists.\n";
-        }
-        if (studentCount < 0) {
-            errors += "- Student count cannot be negative.\n";
-        }
-
-        if (!errors.isEmpty()) {
-            return errors;
+            throw new ManagementException("- Department already exists.");
         }
 
         if (departments.length == departmentsCount) {
@@ -160,10 +138,9 @@ public class College {
         Department department = new Department(departmentName, studentCount);
         departments[departmentsCount] = department;
         departmentsCount++;
-        return "SUCCESS";
     }
 
-    private Department getDepartmentByName(String name) {
+    public Department getDepartmentByName(String name) {
         for (int i = 0; i < departmentsCount; i++) {
             if (departments[i].getName().equals(name)) {
                 return departments[i];
@@ -172,57 +149,72 @@ public class College {
         return null;
     }
 
-    public double getDepartmentAverageWage(String departmentName) {
+    public double getDepartmentAverageWage(String departmentName) throws ManagementException {
         Department department = getDepartmentByName(departmentName);
-        if (department == null) return -1;
+        if (department == null) {
+            throw new ManagementException("- Department not found.");
+        }
         return department.getAverageWage();
     }
 
-    public String assignLecturerToDepartment(String lecturerName, String departmentName) {
-        String errors = "";
+    public void assignLecturerToDepartment(String lecturerName, String departmentName) throws ManagementException {
         Lecturer lecturer = getLecturerByName(lecturerName);
         Department department = getDepartmentByName(departmentName);
 
-        if (lecturer == null) errors += "- Lecturer not found.\n";
-        if (department == null) errors += "- Department not found.\n";
+        if (lecturer == null) throw new ManagementException("- Lecturer not found.");
+        if (department == null) throw new ManagementException("- Department not found.");
 
-        if (!errors.isEmpty()) return errors.trim();
-        return department.addLecturer(lecturer);
+        department.addLecturer(lecturer);
     }
 
-    public String assignLecturerToCommittee(String lecturerName, String committeeName) {
-        String errors = "";
+    public void assignLecturerToCommittee(String lecturerName, String committeeName) throws ManagementException, MemberAlreadyInCommitteeException {
         Lecturer lecturer = getLecturerByName(lecturerName);
         Committee committee = getCommitteeByName(committeeName);
 
-        if (lecturer == null) errors += "- Lecturer not found.\n";
-        if (committee == null) errors += "- Committee not found.\n";
+        if (lecturer == null) throw new ManagementException("- Lecturer not found.");
+        if (committee == null) throw new ManagementException("- Committee not found.");
 
-        if (!errors.isEmpty()) return errors.trim();
-        return committee.addLecturer(lecturer);
+        committee.addLecturer(lecturer);
     }
 
-    public String removeLecturerFromCommittee(String lecturerName, String committeeName) {
-        String errors = "";
+    public void removeLecturerFromCommittee(String lecturerName, String committeeName) throws ManagementException {
         Lecturer lecturer = getLecturerByName(lecturerName);
         Committee committee = getCommitteeByName(committeeName);
 
-        if (lecturer == null) errors += "- Lecturer not found.\n";
-        if (committee == null) errors += "- Committee not found.\n";
+        if (lecturer == null) throw new ManagementException("- Lecturer not found.");
+        if (committee == null) throw new ManagementException("- Committee not found.");
 
-        if (!errors.isEmpty()) return errors.trim();
-        return committee.removeLecturer(lecturer);
+        committee.removeLecturer(lecturer);
     }
 
-    public String updateHeadOfCommittee(String lecturerName, String committeeName) {
-        String errors = "";
+    public void updateHeadOfCommittee(String lecturerName, String committeeName) throws ManagementException, MemberAlreadyInCommitteeException {
         Committee committee = getCommitteeByName(committeeName);
         Lecturer lecturer = getLecturerByName(lecturerName);
 
-        if (committee == null) errors += "- Committee not found.\n";
-        if (lecturer == null) errors += "- Lecturer not found.\n";
+        if (committee == null) throw new ManagementException("- Committee not found.");
+        if (lecturer == null) throw new ManagementException("- Lecturer not found.");
 
-        if (!errors.isEmpty()) return errors.trim();
-        return committee.updateHeadOfCommittee(lecturer);
+        if (!(lecturer instanceof Dr)) {
+            throw new ManagementException("- Lecturer is not qualified. Requirements: DR or PROFESSOR.");
+        }
+
+        committee.updateHeadOfCommittee((Dr) lecturer);
+    }
+
+    public void cloneCommittee(String committeeName) throws ManagementException, CloneNotSupportedException {
+        // TODO: חפש את הוועדה המקורית לפי השם שלה (getCommitteeByName). אם לא נמצאה, זרוק ManagementException.
+        // TODO: בצע שכפול לוועדה על ידי קריאה למתודת clone() שלה.
+        // TODO: ודא שיש מספיק מקום במערך committees (אם מלא, הכפל פי 2 כפי שעשית בשאר הפונקציות).
+        // TODO: הוסף את הוועדה המשוכפלת למערך וקדם את המונה committeesCount.
+    }
+
+    public boolean equals(Object obj) {
+        // TODO: השווה בין אובייקטים מסוג College (למשל לפי השם)
+        return false;
+    }
+
+    public String toString() {
+        // TODO: החזר מחרוזת המייצגת את נתוני המכללה
+        return "";
     }
 }

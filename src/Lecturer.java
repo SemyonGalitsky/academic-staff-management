@@ -1,14 +1,14 @@
 public class Lecturer {
-    private String name;
-    private int id;
-    private int wage;
-    private Title degree;
-    private String degreeName;
-    private Department department;
-    private Committee[] committees = new Committee[2];
-    private int committeeCount = 0;
+    protected String name;
+    protected int id;
+    protected int wage;
+    protected Title degree;
+    protected String degreeName;
+    protected Department department;
+    protected Committee[] committees = new Committee[2];
+    protected int committeeCount = 0;
 
-    public Lecturer(String name, int id, int level, String degreeName, int wage) {
+    public Lecturer(String name, int id, int level, String degreeName, int wage) throws ManagementException {
         setName(name);
         setId(id);
         setTitle(level);
@@ -16,54 +16,55 @@ public class Lecturer {
         setWage(wage);
     }
 
-    public boolean setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return true;
     }
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public boolean setId(int id) {
+    public void setId(int id) throws ManagementException {
         if (id > 99999999 && id < 1000000000) {
             this.id = id;
-            return true;
+        } else {
+            throw new ManagementException("ID must contain exactly 9 digits.");
         }
-        return false;
     }
     public int getId() { return id; }
 
-    public boolean setWage(int wage) {
+    public void setWage(int wage) throws ManagementException {
         if (wage >= 0) {
             this.wage = wage;
-            return true;
+        } else {
+            throw new ManagementException("Wage must be positive.");
         }
-        return false;
     }
     public int getWage() { return wage; }
 
-    public boolean setTitle(int level) {
+    public void setTitle(int level) throws ManagementException {
         switch (level) {
             case 1: this.degree = Title.BACHELORS; break;
             case 2: this.degree = Title.MASTERS; break;
             case 3: this.degree = Title.DR; break;
             case 4: this.degree = Title.PROFESSOR; break;
-            default: return false;
+            default: throw new ManagementException("Invalid title level. Must be between 1 and 4.");
         }
-        return true;
     }
     public Title getTitle() { return degree; }
 
-    public boolean setDegreeName(String degreeName) {
+    public void setDegreeName(String degreeName) {
         this.degreeName = degreeName;
-        return true;
     }
     public String getDegreeName() { return degreeName; }
 
-    public boolean setDepartment(Department department) {
-        if (this.department == department) return false;
+    public void setDepartment(Department department) throws ManagementException {
+        if (this.department == department) {
+            throw new ManagementException("Lecturer is already in this department.");
+        }
         this.department = department;
-        return true;
     }
     public Department getDepartment() { return department; }
+
 
     public String toString() {
         String str = "Name: " + name + "\n" +
@@ -85,15 +86,17 @@ public class Lecturer {
         return str;
     }
 
-    private boolean hasCommittee(Committee committee) {
+    protected boolean hasCommittee(Committee committee) {
         for (int i = 0; i < committeeCount; i++) {
             if (committees[i] == committee) return true;
         }
         return false;
     }
 
-    public String addCommittee(Committee committee) {
-        if (hasCommittee(committee)) return "- Lecturer already part of committee.";
+    public void addCommittee(Committee committee) throws MemberAlreadyInCommitteeException {
+        if (hasCommittee(committee)) {
+            throw new MemberAlreadyInCommitteeException("- Lecturer already part of committee.");
+        }
 
         if (committeeCount == committees.length) {
             Committee[] newCommittees = new Committee[committeeCount * 2];
@@ -104,11 +107,12 @@ public class Lecturer {
         }
         committees[committeeCount] = committee;
         committeeCount++;
-        return "SUCCESS";
     }
 
-    public String removeCommittee(Committee committee) {
-        if (!hasCommittee(committee)) return "- Lecturer not in committee.";
+    public void removeCommittee(Committee committee) throws ManagementException {
+        if (!hasCommittee(committee)) {
+            throw new ManagementException("- Lecturer not in committee.");
+        }
 
         int indexToRemove = -1;
         for (int i = 0; i < committeeCount; i++) {
@@ -123,6 +127,11 @@ public class Lecturer {
         }
         committees[committeeCount - 1] = null;
         committeeCount--;
-        return "SUCCESS";
+    }
+
+    public boolean equals(Object obj) {
+        // TODO: לבדוק בעזרת instanceof אם obj הוא Lecturer
+        // TODO: לבצע המרה (Casting) ל-Lecturer ולהשוות בין תעודות הזהות (this.id == ((Lecturer)obj).id)
+        return false;
     }
 }

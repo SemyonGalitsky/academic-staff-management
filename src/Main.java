@@ -1,12 +1,12 @@
 import java.util.Scanner;
-// Semyon Galitsky - 213863310
-// Dor Mendelovich - your id
+// Semyon Galitsky - 213863319
+// Dor Mendelovich - 214289613
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int choice, count, wage, id, title;
-        String lecturerName, degreeName, committeeName, departmentName, result;
+        String lecturerName, degreeName, committeeName, departmentName;
 
         System.out.println("Please provide the college name: ");
         College college = new College(scanner.nextLine());
@@ -17,7 +17,7 @@ public class Main {
             System.out.println("                                      MENU                                       ");
             System.out.println("-----------------------------------------------------------------------------------");
             System.out.println("[0] - Exit");
-            System.out.println("[1] - Add lecturer");
+            System.out.println("[1] - Add lecturer / Dr / Professor");
             System.out.println("[2] - Add committee");
             System.out.println("[3] - Assign lecturer to committee");
             System.out.println("[4] - Update head of committee");
@@ -28,164 +28,183 @@ public class Main {
             System.out.println("[9] - Show salary average of all college lecturers in a department");
             System.out.println("[10]- Show all lecturers");
             System.out.println("[11]- Show all committees");
+            System.out.println("[12]- Add article to Dr / Professor");
+            System.out.println("[13]- Compare Dr / Professors by articles count"); // דרישה 1
+            System.out.println("[14]- Compare committees (by members or total articles)"); // דרישה 2
+            System.out.println("[15]- Duplicate a committee"); // דרישה 3
             System.out.println("-----------------------------------------------------------------------------------");
-            System.out.print("\nPlease select an action: ");
+            System.out.println("\nPlease select an action: ");
 
             choice = scanner.nextInt();
             scanner.nextLine(); // buffer
 
-            switch (choice) {
-                case 0:
-                    System.out.println("Exit selected, shutting system down.");
-                    break;
+            try {
+                switch (choice) {
+                    case 0:
+                        System.out.println("Exit selected, shutting system down.");
+                        break;
 
-                case 1:
-                    System.out.print("Please provide a name: ");
-                    lecturerName = scanner.nextLine();
+                    case 1:
+                        System.out.print("Please provide a name: ");
+                        lecturerName = scanner.nextLine();
 
-                    System.out.print("Please provide an id: ");
-                    id = scanner.nextInt();
+                        System.out.print("Please provide an id (9 digits): ");
+                        id = scanner.nextInt();
 
-                    System.out.println("Please provide Title level [1-4]: ");
-                    System.out.println("    [1] - Bachelors\n    [2] - Masters\n    [3] - Dr\n    [4] - Professor");
-                    title = scanner.nextInt();
-                    scanner.nextLine(); // buffer
+                        System.out.println("Please provide Title level [1-4]: ");
+                        System.out.println("    [1] - Bachelors\n    [2] - Masters\n    [3] - Dr\n    [4] - Professor");
+                        title = scanner.nextInt();
+                        scanner.nextLine(); // buffer
 
-                    System.out.print("Please provide name of Degree: ");
-                    degreeName = scanner.nextLine();
+                        System.out.print("Please provide name of Degree: ");
+                        degreeName = scanner.nextLine();
 
-                    System.out.print("Please provide wage: ");
-                    wage = scanner.nextInt();
-                    scanner.nextLine(); // buffer
+                        System.out.print("Please provide wage: ");
+                        wage = scanner.nextInt();
+                        scanner.nextLine(); // buffer
 
-                    result = college.addLecturer(lecturerName, id, title, degreeName, wage);
-                    if (result.equals("SUCCESS")) {
+                        Lecturer newLecturer;
+                        if (title == 1 || title == 2) {
+                            newLecturer = new Lecturer(lecturerName, id, title, degreeName, wage);
+                        } else if (title == 3) {
+                            newLecturer = new Dr(lecturerName, id, degreeName, wage);
+                        } else if (title == 4) {
+                            System.out.print("Please provide awarding institution for the professor: ");
+                            String institution = scanner.nextLine();
+                            newLecturer = new Professor(lecturerName, id, degreeName, wage, institution);
+                        } else {
+                            throw new ManagementException("Invalid title level. Must be between 1 and 4.");
+                        }
+
+                        college.addLecturer(newLecturer);
                         System.out.println("[Success] Lecturer " + lecturerName + " was successfully added.");
-                    } else {
-                        System.out.println("--- Action Failed ---\n" + result);
-                    }
-                    break;
+                        break;
 
-                case 2:
-                    System.out.print("Please provide the name of the committee you wish to add: ");
-                    committeeName = scanner.nextLine();
-                    System.out.print("Please provide the name of the head of the committee: ");
-                    lecturerName = scanner.nextLine();
+                    case 2:
+                        System.out.print("Please provide the name of the committee you wish to add: ");
+                        committeeName = scanner.nextLine();
+                        System.out.print("Please provide the name of the head of the committee: ");
+                        lecturerName = scanner.nextLine();
 
-                    result = college.addCommittee(committeeName, lecturerName);
-                    if (result.equals("SUCCESS")) {
+                        college.addCommittee(committeeName, lecturerName);
                         System.out.println("[Success] Committee " + committeeName + " was successfully added.");
-                    } else {
-                        System.out.println("--- Action Failed ---\n" + result);
-                    }
-                    break;
+                        break;
 
-                case 3:
-                    System.out.print("Please provide the name of the lecturer: ");
-                    lecturerName = scanner.nextLine();
-                    System.out.print("Please provide the name of the committee: ");
-                    committeeName = scanner.nextLine();
+                    case 3:
+                        System.out.print("Please provide the name of the lecturer: ");
+                        lecturerName = scanner.nextLine();
+                        System.out.print("Please provide the name of the committee: ");
+                        committeeName = scanner.nextLine();
 
-                    result = college.assignLecturerToCommittee(lecturerName, committeeName);
-                    if (result.equals("SUCCESS")) {
+                        college.assignLecturerToCommittee(lecturerName, committeeName);
                         System.out.println("[Success] Assigned successfully.");
-                    } else {
-                        System.out.println("--- Action Failed ---\n" + result);
-                    }
-                    break;
+                        break;
 
-                case 4:
-                    System.out.print("Please provide the name of the lecturer: ");
-                    lecturerName = scanner.nextLine();
-                    System.out.print("Please provide the name of the committee: ");
-                    committeeName = scanner.nextLine();
+                    case 4:
+                        System.out.print("Please provide the name of the lecturer: ");
+                        lecturerName = scanner.nextLine();
+                        System.out.print("Please provide the name of the committee: ");
+                        committeeName = scanner.nextLine();
 
-                    result = college.updateHeadOfCommittee(lecturerName, committeeName);
-                    if (result.equals("SUCCESS")) {
+                        college.updateHeadOfCommittee(lecturerName, committeeName);
                         System.out.println("[Success] Head of committee updated successfully.");
-                    } else {
-                        System.out.println("--- Action Failed ---\n" + result);
-                    }
-                    break;
+                        break;
 
-                case 5:
-                    System.out.print("Please provide the name of the lecturer: ");
-                    lecturerName = scanner.nextLine();
-                    System.out.print("Please provide the name of the committee: ");
-                    committeeName = scanner.nextLine();
+                    case 5:
+                        System.out.print("Please provide the name of the lecturer: ");
+                        lecturerName = scanner.nextLine();
+                        System.out.print("Please provide the name of the committee: ");
+                        committeeName = scanner.nextLine();
 
-                    result = college.removeLecturerFromCommittee(lecturerName, committeeName);
-                    if (result.equals("SUCCESS")) {
+                        college.removeLecturerFromCommittee(lecturerName, committeeName);
                         System.out.println("[Success] Lecturer removed from committee.");
-                    } else {
-                        System.out.println("--- Action Failed ---\n" + result);
-                    }
-                    break;
+                        break;
 
-                case 6:
-                    System.out.print("Please provide the name of the department you wish to add: ");
-                    departmentName = scanner.nextLine();
-                    System.out.print("Please provide the student count: ");
-                    count = scanner.nextInt();
-                    scanner.nextLine(); // buffer
+                    case 6:
+                        System.out.print("Please provide the name of the department you wish to add: ");
+                        departmentName = scanner.nextLine();
+                        System.out.print("Please provide the student count: ");
+                        count = scanner.nextInt();
+                        scanner.nextLine(); // buffer
 
-                    result = college.addDepartment(departmentName, count);
-                    if (result.equals("SUCCESS")) {
+                        college.addDepartment(departmentName, count);
                         System.out.println("[Success] Department " + departmentName + " was successfully added.");
-                    } else {
-                        System.out.println("--- Action Failed ---\n" + result);
-                    }
-                    break;
+                        break;
 
-                case 7:
-                    System.out.print("Please provide the name of the lecturer: ");
-                    lecturerName = scanner.nextLine();
-                    System.out.print("Please provide the name of the department: ");
-                    departmentName = scanner.nextLine();
+                    case 7:
+                        System.out.print("Please provide the name of the lecturer: ");
+                        lecturerName = scanner.nextLine();
+                        System.out.print("Please provide the name of the department: ");
+                        departmentName = scanner.nextLine();
 
-                    result = college.assignLecturerToDepartment(lecturerName, departmentName);
-                    if (result.equals("SUCCESS")) {
+                        college.assignLecturerToDepartment(lecturerName, departmentName);
                         System.out.println("[Success] Lecturer assigned to department.");
-                    } else {
-                        System.out.println("--- Action Failed ---\n" + result);
-                    }
-                    break;
+                        break;
 
-                case 8:
-                    System.out.println("The average wage of all lecturers across the college is: " + college.getAverageWage());
-                    break;
+                    case 8:
+                        System.out.println("The average wage of all lecturers across the college is: " + college.getAverageWage());
+                        break;
 
-                case 9:
-                    System.out.print("Please provide department name: ");
-                    departmentName = scanner.nextLine();
-                    double avg = college.getDepartmentAverageWage(departmentName);
-                    if (avg == -1) {
-                        System.out.println("[Error] Department not found.");
-                    } else {
+                    case 9:
+                        System.out.print("Please provide department name: ");
+                        departmentName = scanner.nextLine();
+                        double avg = college.getDepartmentAverageWage(departmentName);
                         System.out.println("The average wage of lecturers in " + departmentName + " is: " + avg);
-                    }
-                    break;
+                        break;
 
-                case 10:
-                    result = college.getAllLecturersDetails();
-                    if (result.isEmpty()) {
-                        System.out.println("[Error] No lecturers found.");
-                    } else {
-                        System.out.println(result);
-                    }
-                    break;
+                    case 10:
+                        String lecturersDetails = college.getAllLecturersDetails();
+                        if (lecturersDetails.isEmpty()) {
+                            System.out.println("[Error] No lecturers found.");
+                        } else {
+                            System.out.println(lecturersDetails);
+                        }
+                        break;
 
-                case 11:
-                    result = college.getAllCommitteesDetails();
-                    if (result.isEmpty()) {
-                        System.out.println("[Error] No committees found.");
-                    } else {
-                        System.out.println(result);
-                    }
-                    break;
+                    case 11:
+                        String committeesDetails = college.getAllCommitteesDetails();
+                        if (committeesDetails.isEmpty()) {
+                            System.out.println("[Error] No committees found.");
+                        } else {
+                            System.out.println(committeesDetails);
+                        }
+                        break;
 
-                default:
-                    System.out.println("--- Action Failed ---\nInput out of range. Must be between 0 and 11.");
+                    case 12:
+                        // TODO: קליטת שם המרצה ושם המאמר מהמשתמש.
+                        // TODO: שליפת המרצה מתוך college בעזרת getLecturerByName.
+                        // TODO: וידוא בעזרת instanceof שהמרצה הוא מופע של Dr, ביצוע Casting, והפעלת addArticle.
+                        break;
+
+                    case 13:
+                        // TODO: קליטת שמותיהם של 2 דוקטורים/פרופסורים שתרצו להשוות ביניהם.
+                        // TODO: שליפת שני האובייקטים ו-Casting מתאים ל-Dr.
+                        // TODO: קריאה למתודת compareTo (ההשוואה הטבעית שממשנו ב-Dr) והדפסת התוצאה המתאימה.
+                        break;
+
+                    case 14:
+                        // TODO: קליטת שמותיהן של 2 ועדות שתרצו להשוות ביניהן ושליפתן מתוך college.
+                        // TODO: הצגת תת-תפריט לקליטת סוג הקריטריון (1 - לפי כמות חברים, 2 - לפי סך מאמרים).
+                        // TODO: יצירת מופע של ה-Comparator המתאים (CompareCommitteeByMembers או CompareCommitteeByArticles).
+                        // TODO: הפעלת מתודת compare של אותו Comparator והדפסת התוצאה למשתמש.
+                        break;
+
+                    case 15:
+                        // TODO: קליטת שם הוועדה שברצונכם לשכפל.
+                        // TODO: קריאה לפונקציה college.cloneCommittee(committeeName).
+                        break;
+
+                    default:
+                        System.out.println("--- Action Failed ---\nInput out of range. Must be between 0 and 15.");
+                }
+            } catch (MemberAlreadyInCommitteeException e) {
+                System.out.println("--- Action Failed (Committee Membership Error) ---\n" + e.getMessage());
+            } catch (ManagementException e) {
+                System.out.println("--- Action Failed (System Error) ---\n" + e.getMessage());
+            //} catch (CloneNotSupportedException e) {
+                //System.out.println("--- Action Failed (Cloning Error) ---\n" + e.getMessage());
+            } catch (Exception e) {
+                System.out.println("--- Unexpected Error ---\n" + e.getMessage());
             }
 
             if (choice != 0) {
