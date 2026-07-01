@@ -171,8 +171,19 @@ public class Main {
                         break;
 
                     case 12:
-                        // TODO: קליטת שם המרצה ושם המאמר מהמשתמש.
-                        // TODO: שליפת המרצה מתוך college בעזרת getLecturerByName.
+                        //System.out.println("Provide the name of the lecturer: ");
+                        //lecturerName = scanner.nextLine();
+                        //System.out.println("Provide the name of article: ");
+                        //String articleName = scanner.nextLine();
+
+                        //if (college.getLecturerByName(lecturerName) == null){
+                            //System.out.println("[Error] Lecturer not found.");
+                            //break;
+                        //}
+                        //Lecturer lecturer = college.getLecturerByName(lecturerName);
+                        //if (lecturer instanceof Dr){
+                            //((Dr) lecturer).addArticle(articleName);
+                        //}
                         // TODO: וידוא בעזרת instanceof שהמרצה הוא מופע של Dr, ביצוע Casting, והפעלת addArticle.
                         break;
 
@@ -190,8 +201,10 @@ public class Main {
                         break;
 
                     case 15:
-                        // TODO: קליטת שם הוועדה שברצונכם לשכפל.
-                        // TODO: קריאה לפונקציה college.cloneCommittee(committeeName).
+                        System.out.println("Provide the name of the committee you want to clone: ");
+                        committeeName = scanner.nextLine();
+                        college.cloneCommittee(committeeName);
+                        System.out.println("Committee " + committeeName + " was duplicated successfully.");
                         break;
 
                     default:

@@ -130,8 +130,7 @@ public class Lecturer {
     }
 
     public boolean equals(Object obj) {
-        // TODO: לבדוק בעזרת instanceof אם obj הוא Lecturer
-        // TODO: לבצע המרה (Casting) ל-Lecturer ולהשוות בין תעודות הזהות (this.id == ((Lecturer)obj).id)
-        return false;
+        if (!(obj instanceof Lecturer)) return false;
+        return this.id == ((Lecturer) obj).getId();
     }
 }

@@ -202,19 +202,32 @@ public class College {
     }
 
     public void cloneCommittee(String committeeName) throws ManagementException, CloneNotSupportedException {
-        // TODO: חפש את הוועדה המקורית לפי השם שלה (getCommitteeByName). אם לא נמצאה, זרוק ManagementException.
-        // TODO: בצע שכפול לוועדה על ידי קריאה למתודת clone() שלה.
-        // TODO: ודא שיש מספיק מקום במערך committees (אם מלא, הכפל פי 2 כפי שעשית בשאר הפונקציות).
-        // TODO: הוסף את הוועדה המשוכפלת למערך וקדם את המונה committeesCount.
+        Committee orig = getCommitteeByName(committeeName);
+        if (orig == null) throw new ManagementException("- Committee not found.");
+        Committee clonedCommittee = orig.clone();
+
+        if (committees.length == committeesCount) {
+            Committee[] newCommittees = new Committee[committeesCount * 2];
+            for (int i = 0; i < committeesCount; i++) {
+                newCommittees[i] = committees[i];
+            }
+            committees = newCommittees;
+        }
+            committees[committeesCount] = clonedCommittee;
+            committeesCount++;
     }
 
     public boolean equals(Object obj) {
-        // TODO: השווה בין אובייקטים מסוג College (למשל לפי השם)
-        return false;
+        if (!(obj instanceof College)) return false;
+        return this.name == ((College) obj).getName();
+
     }
 
     public String toString() {
-        // TODO: החזר מחרוזת המייצגת את נתוני המכללה
-        return "";
+        String str = "Name: " + name + "\n" +
+                "   Number of lecturers " + lecturersCount + "\n"+
+                "   Number of Committees "+ committeesCount + "\n"+
+                "   Number of Departments "+ departmentsCount + "\n";
+        return str;
     }
 }

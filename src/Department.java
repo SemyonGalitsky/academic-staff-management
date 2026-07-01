@@ -54,14 +54,22 @@ public class Department {
 
 
     public boolean equals(Object obj) {
-        // TODO: לבדוק בעזרת instanceof אם obj הוא מסוג Department
-        // TODO: לבצע המרה (Casting) ל-Department ולהשוות בין שמות המחלקות (this.name.equals(((Department)obj).name))
-        return false;
+        if (!(obj instanceof Department)) return false;
+        return this.name.equals(((Department) obj).name);
+
     }
 
     public String toString() {
-        // TODO: להחזיר מחרוזת שמייצגת את המחלקה (למשל: שם המחלקה, כמות סטודנטים)
-        // TODO: (אופציונלי) אפשר גם לרוץ בלולאה ולשרשר את שמות המרצים שבמערך lecturers
-        return "";
+        String str = "Name: " + name + "\n" +
+                "   Numbers of students: " + studentCount + "\n";
+
+        if (lecturerCount > 0) {
+            str += "    Lecturers: \n";
+            for (int i = 0; i < lecturerCount; i++) {
+                str += "        " + lecturers[i].getName() + "\n";
+            }
+        }
+        return str;
     }
+
 }
