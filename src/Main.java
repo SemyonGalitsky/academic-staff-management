@@ -246,7 +246,7 @@ public class Main {
                         }
 
                         // TODO: יצירת מופע של ה-Comparator המתאים (CompareCommitteeByMembers או CompareCommitteeByArticles).
-                        // TODO: הפעלת מתודת compare של אותו Comparator והדפסת התוצאה למשתמש.
+                        // TODO: הפעלת מתודת cגדompare של אותו Comparator והדפסת התוצאה למשתמש.
                         break;
 
                     case 15:
