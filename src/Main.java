@@ -171,31 +171,80 @@ public class Main {
                         break;
 
                     case 12:
-                        //System.out.println("Provide the name of the lecturer: ");
-                        //lecturerName = scanner.nextLine();
-                        //System.out.println("Provide the name of article: ");
-                        //String articleName = scanner.nextLine();
+                        System.out.println("Provide the name of the lecturer: ");
+                        lecturerName = scanner.nextLine();
+                        System.out.println("Provide the name of article: ");
+                        String articleName = scanner.nextLine();
 
-                        //if (college.getLecturerByName(lecturerName) == null){
-                            //System.out.println("[Error] Lecturer not found.");
-                            //break;
-                        //}
-                        //Lecturer lecturer = college.getLecturerByName(lecturerName);
-                        //if (lecturer instanceof Dr){
-                            //((Dr) lecturer).addArticle(articleName);
-                        //}
-                        // TODO: וידוא בעזרת instanceof שהמרצה הוא מופע של Dr, ביצוע Casting, והפעלת addArticle.
+                        Lecturer lecturer = college.getLecturerByName(lecturerName);
+
+                        if (lecturer == null) {
+                            System.out.println("[Error] Lecturer not found.");
+                            break;
+                        }
+
+                        if (lecturer instanceof Dr) {
+                            ((Dr) lecturer).addArticle(articleName);
+                            System.out.println("[Success] Article added to lecturer.");
+                            break;
+                        }
+
+                        System.out.println("[Error] Lecturer has to be a Doctor.");
                         break;
 
                     case 13:
-                        // TODO: קליטת שמותיהם של 2 דוקטורים/פרופסורים שתרצו להשוות ביניהם.
-                        // TODO: שליפת שני האובייקטים ו-Casting מתאים ל-Dr.
-                        // TODO: קריאה למתודת compareTo (ההשוואה הטבעית שממשנו ב-Dr) והדפסת התוצאה המתאימה.
+                        System.out.println("Provide the name of the first lecturer you want to compare: ");
+                        String firstName = scanner.nextLine();
+                        System.out.println("Provide the name of the second lecturer you want to compare: ");
+                        String secondName = scanner.nextLine();
+                        Lecturer firstLecturerName = college.getLecturerByName(firstName);
+                        Lecturer secondLecturerName = college.getLecturerByName(secondName);
+                        if (firstLecturerName == null || secondLecturerName == null) {
+                            System.out.println("[Error] One or both lecturers not found.");
+                            break;
+                        }
+
+                        if (!(firstLecturerName instanceof Dr) || !(secondLecturerName instanceof Dr)) {
+                            System.out.println("[Error] Both lecturers must be at least a Doctor to compare articles.");
+                            break;
+                        }
+                        Dr dr1 = (Dr) firstLecturerName;
+                        Dr dr2 = (Dr) secondLecturerName;
+                        int articlesDifference = dr1.compareTo(dr2);
+                        if (articlesDifference > 0){
+                            System.out.println( firstName +"has "+ articlesDifference+ "more articles than "+ secondName+ ".");
+                        }
+                        else if (articlesDifference < 0 ){
+                            System.out.println( secondName +"has " + -(articlesDifference) + "more articles than "+ firstName+ ".");
+                        }
+                        else {
+                            System.out.println( "Both "+firstName+ " and "+ secondName +" have "+ dr1.articlesCount + " articles.");
+                        }
                         break;
 
                     case 14:
-                        // TODO: קליטת שמותיהן של 2 ועדות שתרצו להשוות ביניהן ושליפתן מתוך college.
-                        // TODO: הצגת תת-תפריט לקליטת סוג הקריטריון (1 - לפי כמות חברים, 2 - לפי סך מאמרים).
+                        System.out.println("Provide the name of the first Committee you want to compare: ");
+                        String firstCommittee = scanner.nextLine();
+                        System.out.println("Provide the name of the second Committee you want to compare: ");
+                        String secondCommittee = scanner.nextLine();
+                        Committee firstCommitteeName = college.getCommitteeByName(firstCommittee);
+                        Committee secondCommitteeName = college.getCommitteeByName(secondCommittee);
+
+                        if (firstCommitteeName == null || secondCommitteeName == null) {
+                            System.out.println("[Error] One or both Committees not found.");
+                            break;
+                        }
+                        System.out.println("---------------------------------\n" +
+                                           "1.compare by members?\n" +
+                                           "2.compare by sum of articles?\n" +
+                                           "---------------------------------");
+                        int option = scanner.nextInt();
+                        Committee com1 = (Committee) firstCommitteeName;
+                        Committee com2 = (Committee) secondCommitteeName;
+                        if (option == 1){
+
+                        }
+
                         // TODO: יצירת מופע של ה-Comparator המתאים (CompareCommitteeByMembers או CompareCommitteeByArticles).
                         // TODO: הפעלת מתודת compare של אותו Comparator והדפסת התוצאה למשתמש.
                         break;
