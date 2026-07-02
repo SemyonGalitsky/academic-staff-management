@@ -51,36 +51,57 @@ public class Main {
                         while (true) {
                             System.out.print("Please provide an id (9 digits): ");
                             id = scanner.nextInt();
+                            scanner.nextLine(); // buffer
 
-                            if (college.getLecturerById(id) == null) {
-                                break;
+                            if (id < 100000000 || id > 999999999) {
+                                System.out.println("[Error] ID must be exactly 9 digits. Please try again.");
+                                continue;
                             }
-                            System.out.println("[Error] A lecturer with this ID already exists. Please enter a different ID.");
+
+                            if (college.getLecturerById(id) != null) {
+                                System.out.println("[Error] A lecturer with this ID already exists. Please enter a different ID.");
+                                continue;
+                            }
+                            break;
                         }
 
-                        System.out.println("Please provide Title level [1-4]: ");
-                        System.out.println("    [1] - Bachelors\n    [2] - Masters\n    [3] - Dr\n    [4] - Professor");
-                        title = scanner.nextInt();
-                        scanner.nextLine(); // buffer
+                        while (true) {
+                            System.out.println("Please provide Title level [1-4]: ");
+                            System.out.println("    [1] - Bachelors\n    [2] - Masters\n    [3] - Dr\n    [4] - Professor");
+                            title = scanner.nextInt();
+                            scanner.nextLine(); // buffer
+
+                            if (title < 1 || title > 4) {
+                                System.out.println("[Error] Invalid title level. Must be between 1 and 4.");
+                                continue;
+                            }
+                            break;
+                        }
 
                         System.out.print("Please provide name of Degree: ");
                         degreeName = scanner.nextLine();
 
-                        System.out.print("Please provide wage: ");
-                        wage = scanner.nextInt();
-                        scanner.nextLine(); // buffer
+                        while (true) {
+                            System.out.print("Please provide wage: ");
+                            wage = scanner.nextInt();
+                            scanner.nextLine(); // buffer
+
+                            if (wage < 0) {
+                                System.out.println("[Error] Wage must be positive.");
+                                continue;
+                            }
+                            break;
+                        }
 
                         Lecturer newLecturer;
                         if (title == 1 || title == 2) {
                             newLecturer = new Lecturer(lecturerName, id, title, degreeName, wage);
                         } else if (title == 3) {
                             newLecturer = new Dr(lecturerName, id, degreeName, wage);
-                        } else if (title == 4) {
+                        } else {
                             System.out.print("Please provide awarding institution for the professor: ");
                             String institution = scanner.nextLine();
                             newLecturer = new Professor(lecturerName, id, degreeName, wage, institution);
-                        } else {
-                            throw new ManagementException("Invalid title level. Must be between 1 and 4.");
                         }
 
                         college.addLecturer(newLecturer);
@@ -97,8 +118,22 @@ public class Main {
                             }
                             System.out.println("[Error] Committee name already exists. Please choose a different name.");
                         }
-                        System.out.print("Please provide the name of the head of the committee: ");
-                        lecturerName = scanner.nextLine();
+
+                        while (true) {
+                            System.out.print("Please provide the name of the head of the committee: ");
+                            lecturerName = scanner.nextLine();
+
+                            Lecturer head = college.getLecturerByName(lecturerName);
+                            if (head == null) {
+                                System.out.println("[Error] Lecturer not found. Please try again.");
+                                continue;
+                            }
+                            if (!(head instanceof Dr)) {
+                                System.out.println("[Error] Head of committee must be at least a Dr. Please try again.");
+                                continue;
+                            }
+                            break;
+                        }
 
                         college.addCommittee(committeeName, lecturerName);
                         System.out.println("[Success] Committee " + committeeName + " was successfully added.");
@@ -139,14 +174,24 @@ public class Main {
                             System.out.print("Please provide the name of the department you wish to add: ");
                             departmentName = scanner.nextLine();
 
-                            if (college.getDepartmentByName(departmentName) == null) {
-                                break;
+                            if (college.getDepartmentByName(departmentName) != null) {
+                                System.out.println("[Error] Department name already exists. Please choose a different name.");
+                                continue;
                             }
-                            System.out.println("[Error] Department name already exists. Please choose a different name.");
+                            break;
                         }
-                        System.out.print("Please provide the student count: ");
-                        count = scanner.nextInt();
-                        scanner.nextLine(); // buffer
+
+                        while (true) {
+                            System.out.print("Please provide the student count: ");
+                            count = scanner.nextInt();
+                            scanner.nextLine(); // buffer
+
+                            if (count < 0) {
+                                System.out.println("[Error] Student count cannot be negative. Please try again.");
+                                continue;
+                            }
+                            break;
+                        }
 
                         college.addDepartment(departmentName, count);
                         System.out.println("[Success] Department " + departmentName + " was successfully added.");
@@ -192,39 +237,56 @@ public class Main {
                         break;
 
                     case 12:
-                        System.out.println("Provide the name of the lecturer: ");
-                        lecturerName = scanner.nextLine();
+                        Lecturer lecturer;
+                        while (true) {
+                            System.out.println("Provide the name of the lecturer: ");
+                            lecturerName = scanner.nextLine();
+                            lecturer = college.getLecturerByName(lecturerName);
+
+                            if (lecturer == null) {
+                                System.out.println("[Error] Lecturer not found. Please try again.");
+                                continue;
+                            }
+                            if (!(lecturer instanceof Dr)) {
+                                System.out.println("[Error] Lecturer " + lecturerName + " is not a Dr. or Professor. Cannot add articles. Please try again.");
+                                continue;
+                            }
+                            break;
+                        }
+
                         System.out.println("Provide the name of article: ");
                         String articleName = scanner.nextLine();
 
-                        Lecturer lecturer = college.getLecturerByName(lecturerName);
-
-                        if (lecturer == null) {
-                            throw new ManagementException("- Lecturer not found");
-                        }
-
-                        if (lecturer instanceof Dr) {
-                            ((Dr) lecturer).addArticle(articleName);
-                            System.out.println("[Success] Article added successfully to " + lecturerName + ".");
-                        }else {
-                            throw new ManagementException("- Lecturer " + lecturerName + " is not a Dr. or Professor. Cannot add articles.");
-                        }
+                        ((Dr) lecturer).addArticle(articleName);
+                        System.out.println("[Success] Article added successfully to " + lecturerName + ".");
                         break;
 
                     case 13:
-                        System.out.println("Provide the name of the first lecturer you want to compare: ");
-                        String firstName = scanner.nextLine();
-                        System.out.println("Provide the name of the second lecturer you want to compare: ");
-                        String secondName = scanner.nextLine();
+                        String firstName, secondName;
+                        Lecturer firstLecturer, secondLecturer;
 
-                        Lecturer firstLecturer = college.getLecturerByName(firstName);
-                        Lecturer secondLecturer = college.getLecturerByName(secondName);
+                        while (true) {
+                            System.out.println("Provide the name of the first lecturer you want to compare: ");
+                            firstName = scanner.nextLine();
+                            firstLecturer = college.getLecturerByName(firstName);
 
-                        if (firstLecturer == null || secondLecturer == null) {
-                            throw new ManagementException("- One or both lecturers not found.");
+                            if (!(firstLecturer instanceof Dr)) {
+                                System.out.println("[Error] Lecturer not found or is not at least a Doctor. Please try again.");
+                                continue;
+                            }
+                            break;
                         }
-                        if (!(firstLecturer instanceof Dr) || !(secondLecturer instanceof Dr)) {
-                            throw new ManagementException("- Both lecturers must be at least a Doctor to compare articles.");
+
+                        while (true) {
+                            System.out.println("Provide the name of the second lecturer you want to compare: ");
+                            secondName = scanner.nextLine();
+                            secondLecturer = college.getLecturerByName(secondName);
+
+                            if (!(secondLecturer instanceof Dr)) {
+                                System.out.println("[Error] Lecturer not found or is not at least a Doctor. Please try again.");
+                                continue;
+                            }
+                            break;
                         }
 
                         Dr dr1 = (Dr) firstLecturer;
@@ -242,22 +304,37 @@ public class Main {
                         break;
 
                     case 14:
-                        System.out.println("Provide the name of the first Committee you want to compare: ");
-                        String firstCommitteeName = scanner.nextLine();
-                        System.out.println("Provide the name of the second Committee you want to compare: ");
-                        String secondCommitteeName = scanner.nextLine();
+                        String firstCommitteeName, secondCommitteeName;
+                        Committee firstCommittee, secondCommittee;
 
-                        Committee firstCommittee = college.getCommitteeByName(firstCommitteeName);
-                        Committee secondCommittee = college.getCommitteeByName(secondCommitteeName);
+                        while (true) {
+                            System.out.println("Provide the name of the first Committee you want to compare: ");
+                            firstCommitteeName = scanner.nextLine();
+                            firstCommittee = college.getCommitteeByName(firstCommitteeName);
 
-                        if (firstCommittee == null || secondCommittee == null) {
-                            throw new ManagementException("- One or both Committees not found.");
+                            if (firstCommittee == null){
+                                System.out.println("[Error] Committee not found. Please try again.");
+                                continue;
+                            }
+                            break;
+                        }
+
+                        while (true) {
+                            System.out.println("Provide the name of the second Committee you want to compare: ");
+                            secondCommitteeName = scanner.nextLine();
+                            secondCommittee = college.getCommitteeByName(secondCommitteeName);
+
+                            if (secondCommittee == null){
+                                System.out.println("[Error] Committee not found. Please try again.");
+                                continue;
+                            }
+                            break;
                         }
 
                         System.out.println("---------------------------------\n" +
-                                           "[1] Compare by members.\n" +
-                                           "[2] Compare by sum of articles.\n" +
-                                           "---------------------------------");
+                                "[1] Compare by members.\n" +
+                                "[2] Compare by sum of articles.\n" +
+                                "---------------------------------");
 
                         int option = scanner.nextInt();
                         scanner.nextLine(); //buffer
@@ -269,14 +346,14 @@ public class Main {
                             scanner.nextLine(); //buffer
                         }
 
-                        int comparisonResult = 0;
-                        String comparisonType = "";
+                        int comparisonResult;
+                        String comparisonType;
 
                         if (option == 1) {
                             CompareCommitteeByMembers compByMembers = new CompareCommitteeByMembers();
                             comparisonResult = compByMembers.compare(firstCommittee, secondCommittee);
                             comparisonType = "members";
-                        } else if (option == 2) {
+                        } else {
                             CompareCommitteeByArticles compByArticles = new CompareCommitteeByArticles();
                             comparisonResult = compByArticles.compare(firstCommittee, secondCommittee);
                             comparisonType = "articles";
@@ -292,8 +369,17 @@ public class Main {
                         break;
 
                     case 15:
-                        System.out.println("Provide the name of the committee you want to clone: ");
-                        committeeName = scanner.nextLine();
+                        while (true) {
+                            System.out.println("Provide the name of the committee you want to clone: ");
+                            committeeName = scanner.nextLine();
+
+                            if (college.getCommitteeByName(committeeName) == null) {
+                                System.out.println("[Error] Committee not found. Please try again.");
+                                continue;
+                            }
+                            break;
+                        }
+
                         college.cloneCommittee(committeeName);
                         System.out.println("Committee " + committeeName + " was duplicated successfully.");
                         break;
