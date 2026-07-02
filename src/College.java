@@ -51,6 +51,15 @@ public class College {
         return null;
     }
 
+    public Lecturer getLecturerById(int id) {
+        for (int i = 0; i < lecturersCount; i++) {
+            if (lecturers[i].getId() == id) {
+                return lecturers[i];
+            }
+        }
+        return null;
+    }
+
     public double getAverageWage() {
         if (lecturersCount == 0) return 0;
         double wage = 0;
@@ -219,8 +228,7 @@ public class College {
 
     public boolean equals(Object obj) {
         if (!(obj instanceof College)) return false;
-        return this.name == ((College) obj).getName();
-
+        return this.name.equals(((College) obj).getName());
     }
 
     public String toString() {

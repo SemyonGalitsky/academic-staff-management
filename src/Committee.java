@@ -22,6 +22,21 @@ public class Committee implements Cloneable {
     }
     public Dr getHeadOfCommittee() { return headOfCommittee; }
 
+    public int getMembersCount() {
+        return lecturerCount + 1;
+    }
+
+    public int getTotalArticles() {
+        int total = this.headOfCommittee.getArticlesCount();
+
+        for (int i = 0; i < lecturerCount; i++) {
+            if (lecturers[i] instanceof Dr) {
+                total += ((Dr) lecturers[i]).getArticlesCount();
+            }
+        }
+        return total;
+    }
+
     private boolean hasLecturer(Lecturer lecturer) {
         for (int i = 0; i < lecturerCount; i++) {
             if (lecturers[i] == lecturer) return true;

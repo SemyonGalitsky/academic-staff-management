@@ -29,9 +29,9 @@ public class Main {
             System.out.println("[10]- Show all lecturers");
             System.out.println("[11]- Show all committees");
             System.out.println("[12]- Add article to Dr / Professor");
-            System.out.println("[13]- Compare Dr / Professors by articles count"); // דרישה 1
-            System.out.println("[14]- Compare committees (by members or total articles)"); // דרישה 2
-            System.out.println("[15]- Duplicate a committee"); // דרישה 3
+            System.out.println("[13]- Compare Dr / Professors by articles count");
+            System.out.println("[14]- Compare committees (by members or total articles)");
+            System.out.println("[15]- Duplicate a committee");
             System.out.println("-----------------------------------------------------------------------------------");
             System.out.println("\nPlease select an action: ");
 
@@ -48,8 +48,15 @@ public class Main {
                         System.out.print("Please provide a name: ");
                         lecturerName = scanner.nextLine();
 
-                        System.out.print("Please provide an id (9 digits): ");
-                        id = scanner.nextInt();
+                        while (true) {
+                            System.out.print("Please provide an id (9 digits): ");
+                            id = scanner.nextInt();
+
+                            if (college.getLecturerById(id) == null) {
+                                break;
+                            }
+                            System.out.println("[Error] A lecturer with this ID already exists. Please enter a different ID.");
+                        }
 
                         System.out.println("Please provide Title level [1-4]: ");
                         System.out.println("    [1] - Bachelors\n    [2] - Masters\n    [3] - Dr\n    [4] - Professor");
@@ -81,8 +88,15 @@ public class Main {
                         break;
 
                     case 2:
-                        System.out.print("Please provide the name of the committee you wish to add: ");
-                        committeeName = scanner.nextLine();
+                        while (true) {
+                            System.out.print("Please provide the name of the committee you wish to add: ");
+                            committeeName = scanner.nextLine();
+
+                            if (college.getCommitteeByName(committeeName) == null) {
+                                break;
+                            }
+                            System.out.println("[Error] Committee name already exists. Please choose a different name.");
+                        }
                         System.out.print("Please provide the name of the head of the committee: ");
                         lecturerName = scanner.nextLine();
 
@@ -121,8 +135,15 @@ public class Main {
                         break;
 
                     case 6:
-                        System.out.print("Please provide the name of the department you wish to add: ");
-                        departmentName = scanner.nextLine();
+                        while (true) {
+                            System.out.print("Please provide the name of the department you wish to add: ");
+                            departmentName = scanner.nextLine();
+
+                            if (college.getDepartmentByName(departmentName) == null) {
+                                break;
+                            }
+                            System.out.println("[Error] Department name already exists. Please choose a different name.");
+                        }
                         System.out.print("Please provide the student count: ");
                         count = scanner.nextInt();
                         scanner.nextLine(); // buffer
@@ -179,17 +200,15 @@ public class Main {
                         Lecturer lecturer = college.getLecturerByName(lecturerName);
 
                         if (lecturer == null) {
-                            System.out.println("[Error] Lecturer not found.");
-                            break;
+                            throw new ManagementException("- Lecturer not found");
                         }
 
                         if (lecturer instanceof Dr) {
                             ((Dr) lecturer).addArticle(articleName);
-                            System.out.println("[Success] Article added to lecturer.");
-                            break;
+                            System.out.println("[Success] Article added successfully to " + lecturerName + ".");
+                        }else {
+                            throw new ManagementException("- Lecturer " + lecturerName + " is not a Dr. or Professor. Cannot add articles.");
                         }
-
-                        System.out.println("[Error] Lecturer has to be a Doctor.");
                         break;
 
                     case 13:
@@ -197,56 +216,79 @@ public class Main {
                         String firstName = scanner.nextLine();
                         System.out.println("Provide the name of the second lecturer you want to compare: ");
                         String secondName = scanner.nextLine();
-                        Lecturer firstLecturerName = college.getLecturerByName(firstName);
-                        Lecturer secondLecturerName = college.getLecturerByName(secondName);
-                        if (firstLecturerName == null || secondLecturerName == null) {
-                            System.out.println("[Error] One or both lecturers not found.");
-                            break;
+
+                        Lecturer firstLecturer = college.getLecturerByName(firstName);
+                        Lecturer secondLecturer = college.getLecturerByName(secondName);
+
+                        if (firstLecturer == null || secondLecturer == null) {
+                            throw new ManagementException("- One or both lecturers not found.");
+                        }
+                        if (!(firstLecturer instanceof Dr) || !(secondLecturer instanceof Dr)) {
+                            throw new ManagementException("- Both lecturers must be at least a Doctor to compare articles.");
                         }
 
-                        if (!(firstLecturerName instanceof Dr) || !(secondLecturerName instanceof Dr)) {
-                            System.out.println("[Error] Both lecturers must be at least a Doctor to compare articles.");
-                            break;
-                        }
-                        Dr dr1 = (Dr) firstLecturerName;
-                        Dr dr2 = (Dr) secondLecturerName;
+                        Dr dr1 = (Dr) firstLecturer;
+                        Dr dr2 = (Dr) secondLecturer;
+
                         int articlesDifference = dr1.compareTo(dr2);
-                        if (articlesDifference > 0){
-                            System.out.println( firstName +"has "+ articlesDifference+ "more articles than "+ secondName+ ".");
-                        }
-                        else if (articlesDifference < 0 ){
-                            System.out.println( secondName +"has " + -(articlesDifference) + "more articles than "+ firstName+ ".");
-                        }
-                        else {
-                            System.out.println( "Both "+firstName+ " and "+ secondName +" have "+ dr1.articlesCount + " articles.");
+
+                        if (articlesDifference > 0) {
+                            System.out.println(firstName + " has " + articlesDifference + " more articles than " + secondName + ".");
+                        } else if (articlesDifference < 0) {
+                            System.out.println(secondName + " has " + -(articlesDifference) + " more articles than " + firstName + ".");
+                        } else {
+                            System.out.println("Both " + firstName + " and " + secondName + " have the exact same amount of articles.");
                         }
                         break;
 
                     case 14:
                         System.out.println("Provide the name of the first Committee you want to compare: ");
-                        String firstCommittee = scanner.nextLine();
+                        String firstCommitteeName = scanner.nextLine();
                         System.out.println("Provide the name of the second Committee you want to compare: ");
-                        String secondCommittee = scanner.nextLine();
-                        Committee firstCommitteeName = college.getCommitteeByName(firstCommittee);
-                        Committee secondCommitteeName = college.getCommitteeByName(secondCommittee);
+                        String secondCommitteeName = scanner.nextLine();
 
-                        if (firstCommitteeName == null || secondCommitteeName == null) {
-                            System.out.println("[Error] One or both Committees not found.");
-                            break;
+                        Committee firstCommittee = college.getCommitteeByName(firstCommitteeName);
+                        Committee secondCommittee = college.getCommitteeByName(secondCommitteeName);
+
+                        if (firstCommittee == null || secondCommittee == null) {
+                            throw new ManagementException("- One or both Committees not found.");
                         }
+
                         System.out.println("---------------------------------\n" +
-                                           "1.compare by members?\n" +
-                                           "2.compare by sum of articles?\n" +
+                                           "[1] Compare by members.\n" +
+                                           "[2] Compare by sum of articles.\n" +
                                            "---------------------------------");
-                        int option = scanner.nextInt();
-                        Committee com1 = (Committee) firstCommitteeName;
-                        Committee com2 = (Committee) secondCommitteeName;
-                        if (option == 1){
 
+                        int option = scanner.nextInt();
+                        scanner.nextLine(); //buffer
+
+                        while (option < 1 || option > 2) {
+                            System.out.println("--- Action Failed ---\nInput out of range. Must be 1 or 2.");
+                            System.out.println("Please select a valid input: ");
+                            option = scanner.nextInt();
+                            scanner.nextLine(); //buffer
                         }
 
-                        // TODO: יצירת מופע של ה-Comparator המתאים (CompareCommitteeByMembers או CompareCommitteeByArticles).
-                        // TODO: הפעלת מתודת cגדompare של אותו Comparator והדפסת התוצאה למשתמש.
+                        int comparisonResult = 0;
+                        String comparisonType = "";
+
+                        if (option == 1) {
+                            CompareCommitteeByMembers compByMembers = new CompareCommitteeByMembers();
+                            comparisonResult = compByMembers.compare(firstCommittee, secondCommittee);
+                            comparisonType = "members";
+                        } else if (option == 2) {
+                            CompareCommitteeByArticles compByArticles = new CompareCommitteeByArticles();
+                            comparisonResult = compByArticles.compare(firstCommittee, secondCommittee);
+                            comparisonType = "articles";
+                        }
+
+                        if (comparisonResult > 0) {
+                            System.out.println("Committee '" + firstCommitteeName + "' is greater than '" + secondCommitteeName + "' in terms of " + comparisonType + ".");
+                        } else if (comparisonResult < 0) {
+                            System.out.println("Committee '" + secondCommitteeName + "' is greater than '" + firstCommitteeName + "' in terms of " + comparisonType + ".");
+                        } else {
+                            System.out.println("Both committees are equal in terms of " + comparisonType + ".");
+                        }
                         break;
 
                     case 15:
@@ -263,8 +305,8 @@ public class Main {
                 System.out.println("--- Action Failed (Committee Membership Error) ---\n" + e.getMessage());
             } catch (ManagementException e) {
                 System.out.println("--- Action Failed (System Error) ---\n" + e.getMessage());
-            //} catch (CloneNotSupportedException e) {
-                //System.out.println("--- Action Failed (Cloning Error) ---\n" + e.getMessage());
+            } catch (CloneNotSupportedException e) {
+                System.out.println("--- Action Failed (Cloning Error) ---\n" + e.getMessage());
             } catch (Exception e) {
                 System.out.println("--- Unexpected Error ---\n" + e.getMessage());
             }
